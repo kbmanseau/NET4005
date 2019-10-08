@@ -3,7 +3,7 @@ import java.io.*;
 
 
 
-public class client {  
+public class MyFileClient {  
 
     public static void requestFile(String filename, Socket socket) throws IOException {        
         //Open streams
@@ -16,16 +16,15 @@ public class client {
 
         //Check if file was found
         if (in.readBoolean()) {
-            System.out.println("Made it here");
-            //Create input stream to receive the file
-            byte[] buffer = new byte[4096];
             InputStream inputFile = socket.getInputStream();
-            System.out.println(inputFile);
-
-            //Output stream to write the file
             FileOutputStream fileOutput = new FileOutputStream(filename);
-            inputFile.read(buffer, 0, buffer.length);
-            fileOutput.write(buffer, 0, buffer.length);
+
+            int inCount;
+            byte[] inBuffer = new byte[4096];
+            while ((inCount = inputFile.read(inBuffer)) > 0) {
+                fileOutput.write(inBuffer, 0, inCount);
+            }
+            
             inputFile.close();
             fileOutput.close();
         }  
@@ -33,13 +32,12 @@ public class client {
 
     public static void main(String[] args) throws Exception {
         Socket socket;
-        
-        int port = new Integer(args[1]);
-        String host = new String(args[0]); 
-        String filename = new String(args[2]);
 
         // Collect data from command line
         if (args.length == 3){
+            int port = new Integer(args[1]);
+            String host = new String(args[0]); 
+            String filename = new String(args[2]);
             try {
                 socket = new Socket(host, port);
                 requestFile(filename, socket);

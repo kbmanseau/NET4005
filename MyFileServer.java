@@ -1,7 +1,7 @@
 import java.net.*;
 import java.io.*;
 
-public class server extends Thread {
+public class MyFileServer extends Thread {
 
     private int requests = 0;
     private int goodRequests = 0;
@@ -21,31 +21,26 @@ public class server extends Thread {
         
         // Get filename from client
         String inputFromClient = in.readUTF();
-        String filePath = "server\\" + inputFromClient;
+        
         //String filePath = inputFromClient;
-        System.out.println(filePath);
-        System.out.println("Working Directory = " +
-              System.getProperty("user.dir"));
+        String filePath = "server\\" + inputFromClient;
+
         //Check if file exists
-        File temp = new File(inputFromClient.toString());
+        File temp = new File(filePath);
+
         if (temp.getAbsoluteFile().exists() && !temp.isDirectory()){
-            //.\server\paint.mp4
-            //.\server\paint.mp4
             //Let the client know that the file exists
-            //out.writeBoolean(true);
             out.writeBoolean(true);
             
             //********Send the file*********
             //Read in the file
             FileInputStream file = new FileInputStream(filePath);
-            System.out.println(filePath);
 
-            byte[] buffer = new byte[4096];
-            file.read(buffer, 0, buffer.length);
-
-            //Send the file through an output stream
-            out.write(buffer, 0, buffer.length);
-
+            int outCount;
+            byte[] outBuffer = new byte[4096];
+            while ((outCount = file.read(outBuffer)) > 0) {
+                out.write(outBuffer, 0, outCount);
+            }
             file.close();
         }
 
