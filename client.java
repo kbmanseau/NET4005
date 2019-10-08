@@ -5,35 +5,44 @@ import java.io.*;
 
 public class client {  
 
-    public static void sendFile(String filename, Socket socket) throws IOException {
-        //Code inspired from Carl Ekerot
-        //https://gist.github.com/CarlEkerot/2693246
-        
+    public static void requestFile(String filename, Socket socket) throws IOException {        
+        //Open streams
         DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-        FileInputStream fileinput = new FileInputStream(filename);
-        byte[] buffer = new byte[4096];
-        while (fileinput.read(buffer) > 0){
-            out.write(buffer);
-        }
+        DataInputStream in = new DataInputStream(socket.getInputStream());
 
-        out.close();
-        fileinput.close();
+        //Send filename to server
+        out.writeUTF(filename);
+        
+
+        //Check if file was found
+        if (in.readBoolean()) {
+            System.out.println("Made it here");
+            //Create input stream to receive the file
+            byte[] buffer = new byte[4096];
+            InputStream inputFile = socket.getInputStream();
+            System.out.println(inputFile);
+
+            //Output stream to write the file
+            FileOutputStream fileOutput = new FileOutputStream(filename);
+            inputFile.read(buffer, 0, buffer.length);
+            fileOutput.write(buffer, 0, buffer.length);
+            inputFile.close();
+            fileOutput.close();
+        }  
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Socket socket;
-        String host = new String(); 
-        String filename = new String();
-        int port = 0;
+        
+        int port = new Integer(args[1]);
+        String host = new String(args[0]); 
+        String filename = new String(args[2]);
 
         // Collect data from command line
         if (args.length == 3){
-            host = args[0];
-            port = new Integer(args[1]);
-            filename = args[2];
             try {
                 socket = new Socket(host, port);
-                sendFile(filename, socket);
+                requestFile(filename, socket);
             } catch (Exception e){
                 e.printStackTrace();
             }
