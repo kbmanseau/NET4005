@@ -1,7 +1,14 @@
+/*
+Alexandre Lacasse 101001105
+Kyler Manseau 101003961
+
+NET 4005
+Assignment 1
+
+*/
+
 import java.net.*;
 import java.io.*;
-
-
 
 public class MyFileClient {  
 
@@ -13,6 +20,7 @@ public class MyFileClient {
         //Send filename to server
         out.writeUTF(filename);
         
+
         //Check if file was found
         if (in.readBoolean()) {
             System.out.println("File "+filename+" found at server");
@@ -20,6 +28,8 @@ public class MyFileClient {
             System.out.println("Downloading file "+filename);
             InputStream inputFile = socket.getInputStream();
             FileOutputStream fileOutput = new FileOutputStream(filename);
+
+
 
             int inCount;
             byte[] inBuffer = new byte[4096];
@@ -40,7 +50,7 @@ public class MyFileClient {
 
     public static void main(String[] args) throws Exception {
         Socket socket;
-        
+
         // Collect data from command line
         if (args.length == 3){
             int port = new Integer(args[1]);
